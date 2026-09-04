@@ -124,6 +124,44 @@ class TestBankStatementImportLog(ERPNextTestSuite, AccountsTestMixin):
 		self.assertIsNone(get_float_amount("ABCD"))
 		self.assertIsNone(get_float_amount("****"))
 
+	def test_detect_column_mapping_party_and_fee_columns(self):
+		# Party and fee columns are valid mapping targets (see FIELD_MAP) but were
+		# previously never auto-detected because STANDARD_VARIABLES didn't have
+		# entries for them.
+		header = [
+			"Date",
+			"Deposit",
+			"Withdrawal",
+			"Description",
+			"Reference Number",
+			"Party IBAN",
+			"Party Name/Account Holder",
+			"Party Account No.",
+			"Included Fee",
+			"Excluded Fee",
+		]
+		columns = detect_column_mapping(header)
+		mapping = {column["header_text"]: column["maps_to"] for column in columns}
+
+		self.assertEqual(mapping["Party IBAN"], "Party IBAN")
+		self.assertEqual(mapping["Party Name/Account Holder"], "Party Name/Account Holder")
+		self.assertEqual(mapping["Party Account No."], "Party Account No.")
+		self.assertEqual(mapping["Included Fee"], "Included Fee")
+		self.assertEqual(mapping["Excluded Fee"], "Excluded Fee")
+		# Existing targets should still map as before
+		self.assertEqual(mapping["Date"], "Date")
+		self.assertEqual(mapping["Deposit"], "Deposit")
+		self.assertEqual(mapping["Withdrawal"], "Withdrawal")
+
+	def test_detect_column_mapping_transaction_type_not_mistaken_for_debit_credit(self):
+		# A literal "Transaction Type" header has its own target and should no longer
+		# be swallowed by the "Debit/Credit" alias list.
+		columns = detect_column_mapping(["Transaction Type", "Debit/Credit"])
+		mapping = {column["header_text"]: column["maps_to"] for column in columns}
+
+		self.assertEqual(mapping["Transaction Type"], "Transaction Type")
+		self.assertEqual(mapping["Debit/Credit"], "Debit/Credit")
+
 	# ------------------------------------------------------------------ #
 	# PDF statement import
 	# ------------------------------------------------------------------ #

@@ -587,7 +587,6 @@ HEADER_KEYWORDS = [
 STANDARD_VARIABLES = {
 	"Date": ["date", "transaction date"],
 	"Debit/Credit": [
-		"transaction type",
 		"cr/dr",
 		"dr/cr",
 		"debit/credit",
@@ -601,6 +600,25 @@ STANDARD_VARIABLES = {
 	"Description": ["description", "particulars", "remarks", "narration", "detail", "reference"],
 	"Reference": ["reference", "ref", "tran id", "transaction id", "cheque", "check", "id", "chq"],
 	"Balance": ["balance"],
+	# Appended after the targets above so none of their existing matches are affected -
+	# these only apply when a header doesn't already hit one of the standard targets.
+	"Transaction Type": ["transaction type"],
+	"Party Name/Account Holder": [
+		"party name",
+		"account holder",
+		"counterparty name",
+		"counterparty",
+		"payee",
+		"beneficiary",
+	],
+	"Party Account No.": [
+		"party account no",
+		"party account number",
+		"counterparty account",
+	],
+	"Party IBAN": ["party iban", "iban"],
+	"Included Fee": ["included fee"],
+	"Excluded Fee": ["excluded fee"],
 }
 
 # Map of standard column variable -> transaction row field
